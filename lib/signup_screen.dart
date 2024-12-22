@@ -1,128 +1,85 @@
-import 'package:Shop_KT/Home.dart';
-import 'package:Shop_KT/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:Shop_KT/services/api_service.dart'; // Thêm lớp dịch vụ
 
-class SignUpScreen extends StatelessWidget {
-  const SignUpScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({Key? key}) : super(key: key);
+
+  @override
+  _SignUpScreenState createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+
+  Future<void> signUp() async {
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final address = _addressController.text.trim();
+    final phone = _phoneController.text.trim();
+
+    if (username.isEmpty || email.isEmpty || password.isEmpty || address.isEmpty || phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Vui lòng điền đầy đủ thông tin.")),
+      );
+      return;
+    }
+
+    try {
+      await ApiService.signUp(username, email, password, address, phone);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Đăng ký thành công!")),
+      );
+      _usernameController.clear();
+      _emailController.clear();
+      _passwordController.clear();
+      _addressController.clear();
+      _phoneController.clear();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Đã có lỗi xảy ra: $e")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-
     return Scaffold(
-      body: SingleChildScrollView(
+      appBar: AppBar(title: Text("Đăng ký")),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Hình nền hoặc hình ảnh ở trên
-            Image.asset(
-              "assets/images/bg-nup.jpg", // Đảm bảo file hình ảnh tồn tại trong thư mục assets
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: size.height * 0.3, // Chiều cao chiếm 30% màn hình
+            TextField(
+              controller: _usernameController,
+              decoration: InputDecoration(labelText: 'Username'),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Create Account",
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineSmall
-                        ?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16.0),
-                  const Text(
-                    "Fill in the details below to create a new account.",
-                    style: TextStyle(fontSize: 16.0, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 24.0),
-                  // Form đăng ký
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: "Full Name",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16.0),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: "Email",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16.0),
-                  TextFormField(
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: "Password",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16.0),
-                  TextFormField(
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: "Confirm Password",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 24.0),
-                  // Nút Đăng Ký
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Home()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xfffd723b), // Màu nền nút
-                        foregroundColor: Colors.white, // Màu chữ
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 16.0), // Padding dọc cho nút
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(8.0), // Bo tròn góc nút
-                        ),
-                      ),
-                      child: const Text(
-                        "Sign up",
-                        style: TextStyle(
-                          fontSize: 16, // Kích thước chữ
-                          fontWeight: FontWeight.bold, // Độ đậm chữ
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16.0),
-                  // Liên kết tới Đăng Nhập
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Already have an account?"),
-                      TextButton(
-                        // onPressed: () {
-                        //   // Điều hướng tới màn hình Đăng Nhập
-                        //   Navigator.pop(
-                        //       context); // Quay lại trang trước (LoginScreen)
-                        // },
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginScreen()),
-                          );
-                        },
-                        child: const Text("Log in"),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(labelText: 'Email'),
+              keyboardType: TextInputType.emailAddress,
+            ),
+            TextField(
+              controller: _passwordController,
+              decoration: InputDecoration(labelText: 'Password'),
+              obscureText: true,
+            ),
+            TextField(
+              controller: _addressController,
+              decoration: InputDecoration(labelText: 'Address'),
+            ),
+            TextField(
+              controller: _phoneController,
+              decoration: InputDecoration(labelText: 'Phone'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: signUp,
+              child: Text("Đăng ký"),
             ),
           ],
         ),

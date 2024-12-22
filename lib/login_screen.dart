@@ -1,13 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:Shop_KT/signup_screen.dart';
 import 'package:Shop_KT/Home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:Shop_KT/services/api_service.dart'; // Thêm lớp dịch vụ
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
+  Future<void> _login(BuildContext context, String email, String password) async {
+    try {
+      final user = await ApiService.login(email, password);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('userId', user['id'] ?? '');
+      await prefs.setString('username', user['username'] ?? '');
+      await prefs.setString('email', user['email'] ?? '');
+      await prefs.setString('address', user['address'] ?? '');
+      await prefs.setString('phone', user['phone'] ?? '');
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Home()),
+      );
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to login: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -41,6 +67,7 @@ class LoginScreen extends StatelessWidget {
                   const SizedBox(height: 24.0),
                   // Form đăng nhập
                   TextFormField(
+                    controller: emailController, // Thêm controller cho email
                     decoration: const InputDecoration(
                       labelText: "Email",
                       border: OutlineInputBorder(),
@@ -48,6 +75,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16.0),
                   TextFormField(
+                    controller: passwordController, // Thêm controller cho password
                     obscureText: true,
                     decoration: const InputDecoration(
                       labelText: "Password",
@@ -69,11 +97,8 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Home()),
-                        );
+                      onPressed: () async {
+                        await _login(context, emailController.text, passwordController.text);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xfffd723b), // Màu nền nút
@@ -100,12 +125,6 @@ class LoginScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text("Don't have an account?"),
-                      // TextButton(
-                      //   onPressed: () {
-                      //     // Điều hướng tới màn hình Đăng Ký
-                      //   },
-                      //   child: const Text("Sign up"),
-                      // ),
                       TextButton(
                         onPressed: () {
                           Navigator.push(
