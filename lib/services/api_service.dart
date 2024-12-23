@@ -29,8 +29,8 @@ class ApiService {
 
     if (checkResponse.statusCode == 200) {
       final List users = jsonDecode(checkResponse.body);
-      if (users.isNotEmpty) {
-        throw Exception('Email already exists');
+      if (users.any((user) => user['email'] == email)) {
+        throw Exception('Email đã tồn tại');
       }
 
       final postResponse = await http.post(
