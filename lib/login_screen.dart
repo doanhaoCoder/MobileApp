@@ -41,7 +41,7 @@ class LoginScreen extends StatelessWidget {
           children: [
             // Hình nền hoặc hình ảnh ở trên
             Image.asset(
-              "assets/images/bg.png", // Đảm bảo file hình ảnh tồn tại trong thư mục assets
+              "assets/images/5c5f9bf62dcd9093c9dc2.png", // Đảm bảo file hình ảnh tồn tại trong thư mục assets
               fit: BoxFit.cover,
               width: double.infinity,
               height: size.height * 0.3, // Chiều cao chiếm 30% màn hình

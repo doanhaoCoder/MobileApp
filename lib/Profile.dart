@@ -83,7 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
             CircleAvatar(
               radius: 60,
               backgroundImage: AssetImage(
-                'assets/images/bg.png',
+                'assets/images/user.png',
               ),
             ),
             SizedBox(height: 20),
