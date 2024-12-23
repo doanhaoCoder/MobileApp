@@ -24,32 +24,38 @@ class ApiService {
     }
   }
 
-  static Future<void> signUp(String username, String email, String password, String address, String phone) async {
-    final checkResponse = await http.get(Uri.parse('$baseUrl/users?email=$email'));
+  static Future<bool> checkEmailExists(String email) async {
+    final response = await http.get(Uri.parse('$baseUrl/users'));
 
-    if (checkResponse.statusCode == 200) {
-      final List users = jsonDecode(checkResponse.body);
-      if (users.any((user) => user['email'] == email)) {
-        throw Exception('Email đã tồn tại');
-      }
-
-      final postResponse = await http.post(
-        Uri.parse('$baseUrl/users'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(<String, String>{
-          'username': username,
-          'email': email,
-          'password': password,
-          'address': address,
-          'phone': phone,
-        }),
-      );
-
-      if (postResponse.statusCode != 201) {
-        throw Exception('Failed to sign up');
-      }
+    if (response.statusCode == 200) {
+      final List users = jsonDecode(response.body);
+      return users.any((user) => user['email'] == email);
     } else {
       throw Exception('Failed to check email');
+    }
+  }
+
+  static Future<void> signUp(String username, String email, String password, String address, String phone) async {
+    final emailExists = await checkEmailExists(email);
+
+    if (emailExists) {
+      throw Exception('Email đã tồn tại');
+    }
+
+    final postResponse = await http.post(
+      Uri.parse('$baseUrl/users'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(<String, String>{
+        'username': username,
+        'email': email,
+        'password': password,
+        'address': address,
+        'phone': phone,
+      }),
+    );
+
+    if (postResponse.statusCode != 201) {
+      throw Exception('Failed to sign up');
     }
   }
 }
